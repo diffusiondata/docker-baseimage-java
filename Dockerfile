@@ -4,10 +4,17 @@ MAINTAINER support@pushtechnology.com
 # Put everything in /opt
 WORKDIR /opt
 
-# Install JDK 8u131
-RUN curl http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm -o java.rpm --cookie oraclelicense=accept-securebackup-cookie -L && \
-  rpm -ivh java.rpm && \
-rm java.rpm
+# Install Java.
+RUN \
+  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  add-apt-repository -y ppa:webupd8team/java && \
+  apt-get update && \
+  apt-get install -y oracle-java8-installer=8u131-1~webupd8~2 && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /var/cache/oracle-jdk8-installer
+
+# Define commonly used JAVA_HOME variable
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 RUN rm -rf /etc/service/sshd /etc/my_init.d/00_regen_ssh_host_keys.sh
 
